@@ -67,7 +67,7 @@ const HealthCheckPage: React.FC = () => {
               Service Unavailable
             </Typography>
             <Typography variant="body1" color="textSecondary" paragraph>
-              We're experiencing some technical difficulties. Our team has been notified and is working to resolve the issue.
+              We're experiencing some technical difficulties. Our team has been notified and is working to resolve the issues.
             </Typography>
             <Typography variant="body2" color="textSecondary" paragraph>
               {status?.message}
