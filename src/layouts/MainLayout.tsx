@@ -1,22 +1,16 @@
-import React, { ReactNode, useState, useEffect } from "react";
-import Header from "./Header";
-import Sidebar from "./Sidebar";
+import React from 'react';
+import { Outlet } from 'react-router-dom';
+import Sidebar from './Sidebar';
+import Header from './Header';
 import { useTheme } from "../context/ThemeContext";
 
-interface MainLayoutProps {
-  children: ReactNode;
-}
-
-const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+const MainLayout: React.FC = () => {
   const { theme } = useTheme();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [windowWidth, setWindowWidth] = React.useState(window.innerWidth);
 
   // Apply dark class to html element to ensure all components receive the theme
-  useEffect(() => {
+  React.useEffect(() => {
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
@@ -24,33 +18,53 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     }
   }, [theme]);
 
+  // Track window resize for responsive adjustments
+  React.useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Determine content width based on screen size
+  const getContentMaxWidth = () => {
+    if (windowWidth >= 1920) return 'max-w-screen-2xl'; // Ultra wide screens
+    if (windowWidth >= 1536) return 'max-w-screen-xl';  // Wide screens
+    if (windowWidth >= 1280) return 'max-w-screen-lg';  // Large screens
+    return 'max-w-full';                                // Default for smaller screens
+  };
+
   return (
-    <div className="min-h-screen flex flex-col font-sans">
+    <div className="flex flex-col h-screen bg-gray-50 dark:bg-secondary-900">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+          className="fixed inset-0 z-20 bg-black bg-opacity-50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         ></div>
       )}
 
-      {/* Header - fixed at the top with higher z-index */}
-      <div className="fixed top-0 left-0 right-0 z-30">
-        <Header toggleSidebar={toggleSidebar} />
+      {/* Header */}
+      <div className="sticky top-0 z-30 w-full">
+        <Header openSidebar={() => setSidebarOpen(true)} />
       </div>
 
-      {/* Content area with padding for header */}
-      <div className="flex flex-1 mt-16">
-        {/* Sidebar - z-index between header and backdrop */}
+      {/* Main content area with sidebar */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
         <Sidebar
           isOpen={sidebarOpen}
           closeSidebar={() => setSidebarOpen(false)}
         />
 
-        {/* Main content - with improved scrolling */}
-        <main className="flex-1 overflow-auto bg-secondary-50 dark:bg-secondary-900 transition-colors duration-200 w-full lg:w-auto">
-          <div className="container mx-auto px-4 py-6 max-w-full lg:max-w-7xl">
-            {children}
+        {/* Main content */}
+        <main className="flex-1 overflow-y-auto p-4 pt-6 lg:ml-64">
+          <div className={`mx-auto px-4 ${getContentMaxWidth()}`}>
+            <div className="bg-white dark:bg-secondary-800 shadow-sm rounded-lg p-6">
+              <Outlet />
+            </div>
           </div>
         </main>
       </div>

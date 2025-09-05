@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { User } from '../types/user';
 import SendReminderButton from './SendReminderButton';
 
@@ -45,17 +46,19 @@ const UserRow: React.FC<UserRowProps> = ({ user, onSendReminder, showGroupName =
   };
 
   return (
-    <tr className="hover:bg-secondary-50 dark:hover:bg-secondary-700/30 transition-colors">
+    <tr className="hover:bg-secondary-50 dark:hover:bg-secondary-800/50 transition-colors">
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
           <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 dark:bg-primary-800 flex items-center justify-center">
-            <span className="text-primary-700 dark:text-primary-300 font-medium text-sm">
-              {user.name.split(' ').map(n => n[0]).join('')}
+            <span className="text-primary-700 dark:text-primary-300 font-medium">
+              {user.name.charAt(0)}
             </span>
           </div>
           <div className="ml-4">
             <div className="text-sm font-medium text-secondary-900 dark:text-white">
-              {user.name}
+              <Link to={`/users/${user.id}`} className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                {user.name}
+              </Link>
             </div>
             <div className="text-sm text-secondary-500 dark:text-secondary-400">
               {user.email}
@@ -64,11 +67,11 @@ const UserRow: React.FC<UserRowProps> = ({ user, onSendReminder, showGroupName =
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm text-secondary-900 dark:text-white">{user.phone}</div>
+        <div className="text-sm text-secondary-900 dark:text-white">{user.whatsapp}</div>
       </td>
       {showGroupName && (
         <td className="px-6 py-4 whitespace-nowrap">
-          <div className="text-sm text-secondary-900 dark:text-white">{user.groupName || '-'}</div>
+          <div className="text-sm text-secondary-900 dark:text-white">-</div>
         </td>
       )}
       <td className="px-6 py-4 whitespace-nowrap">
@@ -83,12 +86,20 @@ const UserRow: React.FC<UserRowProps> = ({ user, onSendReminder, showGroupName =
         </span>
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-        {(user.status === 'expiring_soon' || user.status === 'expired') && (
-          <SendReminderButton 
-            userId={user.id} 
-            onSend={() => onSendReminder(user.id)} 
-          />
-        )}
+        <div className="flex justify-end space-x-2">
+          <Link 
+            to={`/users/${user.id}`}
+            className="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 transition-colors"
+          >
+            View
+          </Link>
+          {(user.status === 'expiring_soon' || user.status === 'expired') && (
+            <SendReminderButton 
+              userId={user.id} 
+              onSend={() => onSendReminder(user.id)} 
+            />
+          )}
+        </div>
       </td>
     </tr>
   );

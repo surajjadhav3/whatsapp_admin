@@ -1,53 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { User, UserFilter } from "./types/user";
-import userService from "./services/userService";
+import { userService } from "./services/userService";
 import UserFilterTabs from "./components/UserFilterTabs";
 import UserTable from "./components/UserTable";
 import SendReminderButton from "./components/SendReminderButton";
 import GroupFilter from "./components/GroupFilter";
+import { useUsers } from './hooks/useUsers';
 
 const UserDashboard: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { users, loading, error } = useUsers();
   const [activeFilter, setActiveFilter] = useState<UserFilter>("all");
   const [activeTab, setActiveTab] = useState<"all" | "expiring">("all");
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        const data = await userService.getAll();
-        setUsers(data);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
-  }, []);
-
-  const filteredUsers = users.filter((user) => {
-    if (activeFilter === "all") return true;
-    return user.status === activeFilter;
-  });
-
   const expiringSoonUsers = users.filter((user) => {
     const statusMatch = user.status === "expiring_soon";
-    const groupMatch = selectedGroup ? user.groupName === selectedGroup : true;
-    return statusMatch && groupMatch;
+    return statusMatch;
   });
-
-  // Extract unique group names for the filter
-  const uniqueGroups = Array.from(
-    new Set(
-      users
-        .filter((user) => user.status === "expiring_soon" && user.groupName)
-        .map((user) => user.groupName as string)
-    )
-  ).sort();
 
   const counts = {
     all: users.length,
@@ -142,9 +111,9 @@ const UserDashboard: React.FC = () => {
             counts={counts}
           />
 
-          {filteredUsers.length > 0 ? (
+          {users.length > 0 ? (
             <UserTable
-              users={filteredUsers}
+              users={users}
               onSendReminder={handleSendReminder}
             />
           ) : (
@@ -162,35 +131,25 @@ const UserDashboard: React.FC = () => {
               <h2 className="text-xl font-display font-semibold text-secondary-900 dark:text-white mr-6">
                 Expiring Soon Users
               </h2>
-              {uniqueGroups.length > 0 && (
-                <GroupFilter
-                  groups={uniqueGroups}
-                  selectedGroup={selectedGroup}
-                  onSelectGroup={setSelectedGroup}
+              {expiringSoonUsers.length > 0 && (
+                <SendReminderButton
+                  isAll
+                  onSend={handleSendReminderToAll}
+                  className="ml-4"
                 />
               )}
             </div>
-            {expiringSoonUsers.length > 0 && (
-              <SendReminderButton
-                isAll
-                onSend={handleSendReminderToAll}
-                className="ml-4"
-              />
-            )}
           </div>
 
           {expiringSoonUsers.length > 0 ? (
             <UserTable
               users={expiringSoonUsers}
               onSendReminder={handleSendReminder}
-              showGroupName={true}
             />
           ) : (
             <div className="bg-white dark:bg-secondary-800 shadow rounded-lg p-6 text-center">
               <p className="text-secondary-500 dark:text-secondary-400">
-                {selectedGroup
-                  ? `No users with expiring plans found in group "${selectedGroup}".`
-                  : "No users with expiring plans found."}
+                No users with expiring plans found.
               </p>
             </div>
           )}

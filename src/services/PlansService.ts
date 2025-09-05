@@ -1,5 +1,6 @@
+import { mockPlans } from "../features/plans/mockData";
 import { Plan } from "../features/plans/types";
-import { mockPlans } from "./mockData";
+
 
 class PlansService {
   async getAll(): Promise<Plan[]> {

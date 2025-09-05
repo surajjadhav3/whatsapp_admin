@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { User } from "../../../types";
-import UsersService from "../../../services/UsersService";
+import { User } from "../types/user";
+import { userService } from "../services/userService";
 
 export const useUsers = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -11,7 +11,7 @@ export const useUsers = () => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const data = await UsersService.getAll();
+        const data = await userService.getUsers();
         setUsers(data);
         setError(null);
       } catch (err) {
