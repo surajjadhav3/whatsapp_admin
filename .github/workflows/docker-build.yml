@@ -46,7 +46,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             # docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/react-app:latest
-            docker stop react-app || true
-            docker rm react-app || true
-            docker run -d -p 80:3000 --name react-app ${{ secrets.DOCKERHUB_USERNAME }}/react-app:latest
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/react-app:latest
+            sudo docker stop react-app || true
+            sudo docker rm react-app || true
+            sudo docker run -d -p 80:3000 --name react-app ${{ secrets.DOCKERHUB_USERNAME }}/react-app:latest
