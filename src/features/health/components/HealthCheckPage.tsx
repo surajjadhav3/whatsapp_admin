@@ -64,7 +64,7 @@ const HealthCheckPage: React.FC = () => {
           <Box sx={{ color: 'error.main' }}>
             <ErrorOutlineIcon sx={{ fontSize: 80 }} />
             <Typography variant="h4" gutterBottom sx={{ mt: 2 }}>
-              Service Unavailable
+              Service Unavailable -- deploy check
             </Typography>
             <Typography variant="body1" color="textSecondary" paragraph>
               We're experiencing some technical difficulties. Our team has been notified and is working to resolve the issues.
